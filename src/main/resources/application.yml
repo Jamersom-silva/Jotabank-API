@@ -17,3 +17,9 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
+app:
+  security:
+    jwt:
+      secret: "DEV-CHANGE-ME-TO-A-VERY-LONG-SECRET-AT-LEAST-32-CHARS"
+      issuer: "jotabank"
+      expirationMinutes: 60
