@@ -18,8 +18,11 @@ public class TransactionController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<TransactionItemResponse>> myTransactions() {
+    public ResponseEntity<List<TransactionItemResponse>> myTransactions(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "20") int size
+    ) {
         String email = AuthContext.requireEmail();
-        return ResponseEntity.ok(service.myStatement(email));
+        return ResponseEntity.ok(service.myStatement(email, page, size));
     }
 }
