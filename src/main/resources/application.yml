@@ -1,19 +1,36 @@
+server:
+  port: 8080
+
 spring:
   datasource:
     url: jdbc:h2:mem:jotabank;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
-    driverClassName: org.h2.Driver
+    driver-class-name: org.h2.Driver
     username: sa
-    password:
+    password: ""
+
   jpa:
     hibernate:
       ddl-auto: update
+    open-in-view: false
     properties:
       hibernate:
         format_sql: true
+
   h2:
     console:
       enabled: true
+      path: /h2-console
 
 logging:
   level:
+    org.springframework.security: TRACE
+    org.springframework.web.cors: DEBUG
     org.hibernate.SQL: debug
+
+
+app:
+  security:
+    jwt:
+      secret: "DEV-CHANGE-ME-TO-A-VERY-LONG-SECRET-AT-LEAST-32-CHARS"
+      issuer: "jotabank"
+      expirationMinutes: 60
