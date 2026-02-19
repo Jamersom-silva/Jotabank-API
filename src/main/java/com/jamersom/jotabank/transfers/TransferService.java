@@ -2,6 +2,7 @@ package com.jamersom.jotabank.transfers;
 
 import com.jamersom.jotabank.accounts.Account;
 import com.jamersom.jotabank.accounts.AccountRepository;
+import com.jamersom.jotabank.common.errors.NotFoundException;
 import com.jamersom.jotabank.transfers.dto.TransferRequest;
 import com.jamersom.jotabank.transfers.dto.TransferResponse;
 import com.jamersom.jotabank.transactions.Transaction;
@@ -29,13 +30,13 @@ public class TransferService {
     @Transactional
     public TransferResponse transfer(String email, TransferRequest req) {
         var user = users.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         Account from = user.getAccount();
         if (from == null) throw new IllegalStateException("User has no account");
 
         Account to = accounts.findByAccountNumber(req.toAccountNumber())
-                .orElseThrow(() -> new IllegalArgumentException("Destination account not found"));
+                .orElseThrow(() -> new NotFoundException("Destination account not found"));
 
         if (from.getId().equals(to.getId())) {
             throw new IllegalArgumentException("Cannot transfer to the same account");
@@ -50,11 +51,11 @@ public class TransferService {
             throw new IllegalArgumentException("Currency mismatch");
         }
 
-        // atualiza saldos (debit já valida saldo suficiente)
+        // atualiza saldos (debit valida saldo suficiente)
         from.debit(amount);
         to.credit(amount);
 
-        // opcional dentro de @Transactional, mas pode manter
+        // dentro de @Transactional, save é opcional, mas pode manter
         accounts.save(from);
         accounts.save(to);
 

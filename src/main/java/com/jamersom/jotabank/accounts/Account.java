@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import com.jamersom.jotabank.common.errors.UnprocessableEntityException;
 
 @Entity
 @Table(
@@ -66,7 +67,8 @@ public class Account {
     public void debit(BigDecimal amount) {
         BigDecimal normalized = normalize(amount);
         if (normalized.signum() <= 0) throw new IllegalArgumentException("Amount must be positive");
-        if (this.balance.compareTo(normalized) < 0) throw new IllegalArgumentException("Insufficient balance");
+        if (this.balance.compareTo(normalized) < 0) throw new UnprocessableEntityException("Insufficient balance");
+
         this.balance = this.balance.subtract(normalized);
     }
 

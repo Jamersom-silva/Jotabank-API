@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.AuthenticationException;
+import com.jamersom.jotabank.common.errors.ConflictException;
 
 import java.math.BigDecimal;
 
@@ -43,7 +44,8 @@ public class AuthService {
     @Transactional
     public void register(RegisterRequest req) {
         if (users.existsByEmail(req.email())) {
-            throw new com.jamersom.jotabank.common.errors.ConflictException("Email already in use");
+            throw new ConflictException("Email already in use");
+
 
         }
 
