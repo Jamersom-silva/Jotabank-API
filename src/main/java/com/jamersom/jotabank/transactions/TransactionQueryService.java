@@ -35,10 +35,15 @@ public class TransactionQueryService {
 
         return list.stream().map(tx -> {
 
-            boolean isOutgoing = tx.getFromAccount() != null &&
-                    tx.getFromAccount().getId().equals(account.getId());
-
-            String direction = isOutgoing ? "OUT" : "IN";
+            String direction = switch (tx.getType()) {
+                case DEPOSIT -> "IN";
+                case WITHDRAW -> "OUT";
+                case TRANSFER -> {
+                    boolean isOutgoing = tx.getFromAccount() != null
+                            && tx.getFromAccount().getId().equals(account.getId());
+                    yield isOutgoing ? "OUT" : "IN";
+                }
+            };
 
             return new TransactionItemResponse(
                     tx.getId(),
