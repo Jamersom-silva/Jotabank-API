@@ -23,14 +23,12 @@ spring:
 
 logging:
   level:
-    org.springframework.security: TRACE
-    org.springframework.web.cors: DEBUG
     org.hibernate.SQL: debug
-
+    org.springframework.security: info
 
 app:
   security:
     jwt:
-      secret: "DEV-CHANGE-ME-TO-A-VERY-LONG-SECRET-AT-LEAST-32-CHARS"
+      secret: "${JWT_SECRET:DEV-CHANGE-ME-TO-A-VERY-LONG-SECRET-AT-LEAST-32-CHARS}"
       issuer: "jotabank"
       expirationMinutes: 60
