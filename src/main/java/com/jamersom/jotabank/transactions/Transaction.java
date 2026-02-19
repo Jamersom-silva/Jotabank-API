@@ -66,4 +66,9 @@ public class Transaction {
         this.description = (description == null || description.isBlank()) ? type.name() : description.trim();
         this.createdAt = OffsetDateTime.now();
     }
+    public static Transaction withdraw(Account from, BigDecimal amount, String description) {
+        // saque: sai de uma conta e "vai" pra ela mesma só pra manter toAccount NOT NULL
+        return new Transaction(from, from, amount, TransactionType.WITHDRAW, description);
+    }
+
 }

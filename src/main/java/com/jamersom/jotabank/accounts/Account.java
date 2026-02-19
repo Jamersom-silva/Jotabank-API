@@ -2,9 +2,10 @@ package com.jamersom.jotabank.accounts;
 
 import com.jamersom.jotabank.users.User;
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
+import com.jamersom.jotabank.common.errors.UnprocessableEntityException;
 
 @Entity
 @Table(
@@ -56,11 +57,23 @@ public class Account {
     public Instant getCreatedAt() { return createdAt; }
     public User getUser() { return user; }
 
+    // dentro da classe Account
     public void credit(BigDecimal amount) {
-        this.balance = this.balance.add(amount);
+        BigDecimal normalized = normalize(amount);
+        if (normalized.signum() <= 0) throw new IllegalArgumentException("Amount must be positive");
+        this.balance = this.balance.add(normalized);
     }
 
     public void debit(BigDecimal amount) {
-        this.balance = this.balance.subtract(amount);
+        BigDecimal normalized = normalize(amount);
+        if (normalized.signum() <= 0) throw new IllegalArgumentException("Amount must be positive");
+        if (this.balance.compareTo(normalized) < 0) throw new UnprocessableEntityException("Insufficient balance");
+
+        this.balance = this.balance.subtract(normalized);
+    }
+
+    private BigDecimal normalize(BigDecimal amount) {
+        if (amount == null) throw new IllegalArgumentException("Amount is required");
+        return amount.setScale(2, RoundingMode.UNNECESSARY);
     }
 }
