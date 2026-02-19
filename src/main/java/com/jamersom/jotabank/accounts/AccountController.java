@@ -6,6 +6,8 @@ import com.jamersom.jotabank.common.security.AuthContext;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.jamersom.jotabank.accounts.dto.WithdrawRequest;
+import com.jamersom.jotabank.accounts.dto.WithdrawResponse;
 
 @RestController
 @RequestMapping("/accounts")
@@ -22,4 +24,10 @@ public class AccountController {
         String email = AuthContext.requireEmail();
         return ResponseEntity.ok(ops.deposit(email, req));
     }
+    @PostMapping("/me/withdraw")
+    public ResponseEntity<WithdrawResponse> withdraw(@Valid @RequestBody WithdrawRequest req) {
+        String email = AuthContext.requireEmail();
+        return ResponseEntity.ok(ops.withdraw(email, req));
+    }
+
 }

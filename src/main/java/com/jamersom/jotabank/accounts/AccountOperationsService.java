@@ -7,6 +7,8 @@ import com.jamersom.jotabank.transactions.TransactionRepository;
 import com.jamersom.jotabank.users.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.jamersom.jotabank.accounts.dto.WithdrawRequest;
+import com.jamersom.jotabank.accounts.dto.WithdrawResponse;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -57,5 +59,38 @@ public class AccountOperationsService {
                 account.getCurrency(),
                 tx.getCreatedAt().toString()
         );
+
     }
+    @Transactional
+    public WithdrawResponse withdraw(String email, WithdrawRequest req) {
+        var user = users.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Account account = user.getAccount();
+        if (account == null) throw new IllegalStateException("User has no account");
+
+        BigDecimal amount = req.amount().setScale(2, RoundingMode.UNNECESSARY);
+        if (amount.signum() <= 0) throw new IllegalArgumentException("Amount must be positive");
+
+        // valida saldo + debita
+        account.debit(amount);
+
+        accounts.save(account);
+
+        String description = (req.description() == null || req.description().isBlank())
+                ? "Withdraw"
+                : req.description().trim();
+
+        Transaction tx = Transaction.withdraw(account, amount, description);
+        tx = transactions.save(tx);
+
+        return new WithdrawResponse(
+                tx.getId(),
+                account.getAccountNumber(),
+                account.getBalance().toPlainString(),
+                account.getCurrency(),
+                tx.getCreatedAt().toString()
+        );
+    }
+
 }
